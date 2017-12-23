@@ -8,3 +8,5 @@ https://www.a1k0n.net/2015/11/09/javascript-ft2-player.html
 
 Some changes have been made by Casey Clyde to the library for more accurate effects for files created in MilkyTracker.
 https://github.com/Preece
+
+This is a node application using express. I am going to totally re-write it as a react app.
