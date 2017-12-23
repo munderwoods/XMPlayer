@@ -1,6 +1,6 @@
 # XMPlayer
 
-This is a simple in-browser player for XM files ONLY. XM is a format used for chiptune music classically composed in the FastTracker 2 sequencer. MilkeyTracker is a good modern alternative. 
+This is a simple in-browser player for XM files ONLY. XM is a format used for chiptune music classically composed in the FastTracker 2 sequencer. MilkyTracker is a good modern alternative. 
 http://milkytracker.titandemo.org/
 
 This uses the ft2 library which was reverse-engineered by a1k0n. 
