@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>XM Player</title>
+    <style>
+    </style>
+</head>
+<body>
+    <h1>Play a jam!</h1>
+
+    <br>
+
+    <h3 id="songHeading">{{currentSong}}</h3>
+
+    <button id="playButton">Play</button>
+    <button id="stopButton">Stop</button>
+    <button id="nextButton">Next</button>
+    <button id="previousButton">Previous</button>
+
+    <h2>Library:</h2>
+
+    <ul style="list-style: none;">
+        {{#songList}}
+        <li><a class="songItems" id="{{.}}"href="">{{.}}</a><button class="delete">x</button></li>
+        {{/songList}}
+    </ul>
+
+    <br>
+
+    <h3>Or Upload Your Own:</h3>
+
+    <form ref='uploadForm'
+        id='uploadForm'
+        action='http://localhost:3000/upload'
+        method='post'
+        encType="multipart/form-data">
+            <input type="file" name="songUpload" />
+            <input type='submit' value='Upload' />
+    </form>
+
+
+    <script type="text/javascript" src="player.js"></script>
+
+    <script type="text/javascript" src="ft2.js"></script>
+
+    <script>
+        var currentSong = '{{currentSong}}';
+        var XMPlayer = new Modplayer();
+        var songItems = document.getElementsByClassName('songItems');
+        var deleteButtons = document.getElementsByClassName('delete');
+
+    //add click actions to each button
+        document.getElementById('playButton')
+        .addEventListener('click', _ => playSong());
+
+        document.getElementById('stopButton')
+        .addEventListener('click', _ => stop());
+
+        document.getElementById('nextButton')
+        .addEventListener('click', _ => nextSong());
+
+        document.getElementById('previousButton')
+        .addEventListener('click', _ => previousSong());
+
+    //add click action to each song in song list
+    Array.from(songItems).forEach(function (currentValue, index) {
+        currentValue.addEventListener('click', event => {
+            event.preventDefault();
+            changeSongByList(currentValue);
+        });
+    })
+
+    //add click actions to x buttons to delete songs from song list
+    Array.from(deleteButtons).forEach(i => i.addEventListener('click', event => deleteSong(event)));
+
+    function setTitle(songTitle) {
+        document.getElementById('songHeading').textContent = songTitle;
+    };
+
+    function deleteSong(event) {
+        elem = event.path[1].children[0].id;
+        location.assign('/delete/' + elem);
+    }
+
+
+    function nextSong() {
+        var playing = false;
+        var songs = Array.from(songItems);
+        button = document.getElementById('playButton');
+        if (XMPlayer.playing === true) {
+            playing = true;
+        }
+        XMPlayer.stop();
+        if (button.textContent === 'Pause') {
+            button.textContent = 'Play';
+        };
+        currentIndex = songs.findIndex(function (element, index, array) {
+            if (element.textContent === currentSong) {
+                return true;
+            };
+        });
+        if (currentIndex === songs.length -1) {
+            currentSong = songs[0].textContent;
+        } else {
+            currentSong = songs[currentIndex + 1].textContent;
+        };
+        setTitle(currentSong);
+        if (playing === true) {
+            playSong();
+        }
+    };
+
+    function previousSong() {
+        var playing = false;
+        var songs = Array.from(songItems);
+        button = document.getElementById('playButton');
+        if (XMPlayer.playing === true) {
+            playing = true;
+        }
+        XMPlayer.stop();
+        if (button.textContent === 'Pause') {
+            button.textContent = 'Play';
+        };
+        currentIndex = songs.findIndex(function (element, index, array) {
+            if (element.textContent === currentSong) {
+                return true;
+            };
+        });
+        if (currentIndex === 0) {
+            currentSong = songs[songs.length - 1].textContent;
+        } else {
+            currentSong = songs[currentIndex - 1].textContent;
+        };
+        setTitle(currentSong);
+        if (playing === true) {
+            playSong();
+        }
+    };
+
+    function changeSongByList(song) {
+        button = document.getElementById('playButton');
+        XMPlayer.stop();
+        if (button.textContent === 'Pause') {
+            button.textContent = 'Play';
+        }
+        currentSong = song.innerHTML;
+        setTitle(currentSong);
+        playSong();
+    }
+
+	function playSong () {
+        if (XMPlayer.playing === false) {
+        XMPlayer.autostart = true;
+            XMPlayer.load('http://localhost:3000/songs/' + currentSong);
+        playToPause();
+        } else if (XMPlayer.playing === true) {
+            XMPlayer.pause();
+            playToPause();
+        }
+    }
+
+    function playToPause() {
+        button = document.getElementById('playButton');
+        if(button.textContent === 'Play') {
+            button.textContent = 'Pause';
+        }else if (button.textContent === 'Pause') {
+            button.textContent = 'Play';
+        }
+    }
+
+    function stop() {
+        if (XMPlayer.playing === true) {
+            XMPlayer.stop();
+            if (button.textContent === 'Pause') {
+                button.textContent = 'Play';
+            }
+        }
+    }
+
+    </script>
+</body>
+</html>
