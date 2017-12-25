@@ -3,46 +3,64 @@
 <head>
     <meta charset="UTF-8">
     <title>XM Player</title>
-    <style>
-    </style>
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
 </head>
 <body>
-    <h1>Play a jam!</h1>
+    <div style="margin: 0 auto; width: 600px;">
+        <div class="jumbotron">
+            <div class="text-center">
+                <h1 >Play a Jam!</h1>
 
-    <br>
+                <br>
 
-    <h3 id="songHeading">{{currentSong}}</h3>
+                <h3 id="songHeading">{{currentSong}}</h3>
 
-    <button id="playButton">Play</button>
-    <button id="stopButton">Stop</button>
-    <button id="nextButton">Next</button>
-    <button id="previousButton">Previous</button>
+                <div>
+                    <button id="previousButton" class="btn btn-default"><i class="fa fa-step-backward" aria-hidden="true"></i></button>
+                    <button id="playButton" class="btn btn-default"><i class="fa fa-play" aria-hidden="true"></i></button>
+                    <button id="stopButton" class="btn btn-default"><i class="fa fa-stop" aria-hidden="true"></i></button>
+                    <button id="nextButton" class="btn btn-default"><i class="fa fa-step-forward" aria-hidden="true"></i></button>
+                </div>
 
-    <h2>Library:</h2>
+                <br>
+                <br>
 
-    <ul style="list-style: none;">
-        {{#songList}}
-        <li><a class="songItems" id="{{.}}"href="">{{.}}</a><button class="delete">x</button></li>
-        {{/songList}}
-    </ul>
+                <h4> Select A Song From The Library:</h4>
 
-    <br>
+                <ul  class="list-group" style="list-style: none; margin: 0 auto; width: 300px;">
+                    {{#songList}}
+                    <li class="list-group-item">
+                            <div class="delete" style="float: right; display: inline-block">
+                                <button class="btn btn-default" style="padding: 2px 4px; font-size: 8px;"><i class="fa fa-remove" aria-hidden="true"></i></button>
+                            </div>
+                                <a class="songItems" id="{{.}}"href="">{{.}}</a></li>
+                    {{/songList}}
+                </ul>
+            </div>
+        </div>
 
-    <h3>Or Upload Your Own:</h3>
 
-    <form ref='uploadForm'
-        id='uploadForm'
-        action='http://localhost:3000/upload'
-        method='post'
-        encType="multipart/form-data">
-            <input type="file" name="songUpload" />
-            <input type='submit' value='Upload' />
-    </form>
+        <h3>Or Upload Your Own:</h3>
 
+        <form ref='uploadForm'
+            id='uploadForm'
+            action='http://localhost:3000/upload'
+            method='post'
+            encType="multipart/form-data">
+                <input type="file" name="songUpload" />
+                <button type='submit'/>
+                    <i class="fa fa-upload" aria-hidden="true"></i>
+                </button>
+        </form>
+    </div>
 
     <script type="text/javascript" src="player.js"></script>
 
     <script type="text/javascript" src="ft2.js"></script>
+
+    <script src="https://use.fontawesome.com/c291dc5b36.js"></script>
 
     <script>
         var currentSong = '{{currentSong}}';
@@ -79,7 +97,8 @@
     };
 
     function deleteSong(event) {
-        elem = event.path[1].children[0].id;
+        li = event.path.find(i => i.nodeName === "LI")
+        elem = (li.children[1].id);
         location.assign('/delete/' + elem);
     }
 
@@ -92,8 +111,8 @@
             playing = true;
         }
         XMPlayer.stop();
-        if (button.textContent === 'Pause') {
-            button.textContent = 'Play';
+        if (button.innerHTML === '<i class="fa fa-pause" aria-hidden="true"></i>') {
+            button.innerHTML = '<i class="fa fa-play" aria-hidden="true"></i>';
         };
         currentIndex = songs.findIndex(function (element, index, array) {
             if (element.textContent === currentSong) {
@@ -111,6 +130,22 @@
         }
     };
 
+    function autoNext() {
+        var songs = Array.from(songItems);
+        currentIndex = songs.findIndex(function (element, index, array) {
+            if (element.textContent === currentSong) {
+                return true;
+            };
+        });
+        if (currentIndex === songs.length -1) {
+            currentSong = songs[0].textContent;
+        } else {
+            currentSong = songs[currentIndex + 1].textContent;
+        };
+        setTitle(currentSong);
+        playSong();
+    };
+
     function previousSong() {
         var playing = false;
         var songs = Array.from(songItems);
@@ -119,8 +154,8 @@
             playing = true;
         }
         XMPlayer.stop();
-        if (button.textContent === 'Pause') {
-            button.textContent = 'Play';
+        if (button.innerHTML === '<i class="fa fa-pause" aria-hidden="true"></i>') {
+            button.innerHTML = '<i class="fa fa-play" aria-hidden="true"></i>';
         };
         currentIndex = songs.findIndex(function (element, index, array) {
             if (element.textContent === currentSong) {
@@ -132,6 +167,7 @@
         } else {
             currentSong = songs[currentIndex - 1].textContent;
         };
+
         setTitle(currentSong);
         if (playing === true) {
             playSong();
@@ -141,8 +177,8 @@
     function changeSongByList(song) {
         button = document.getElementById('playButton');
         XMPlayer.stop();
-        if (button.textContent === 'Pause') {
-            button.textContent = 'Play';
+        if (button.innerHTML === '<i class="fa fa-pause" aria-hidden="true"></i>') {
+            button.innerHTML = '<i class="fa fa-play" aria-hidden="true"></i>';
         }
         currentSong = song.innerHTML;
         setTitle(currentSong);
@@ -151,29 +187,34 @@
 
 	function playSong () {
         if (XMPlayer.playing === false) {
-        XMPlayer.autostart = true;
+            XMPlayer.autostart = true;
             XMPlayer.load('http://localhost:3000/songs/' + currentSong);
-        playToPause();
+            playToPause();
         } else if (XMPlayer.playing === true) {
             XMPlayer.pause();
             playToPause();
         }
-    }
+        XMPlayer.onStop = function () {
+            if (XMPlayer.endofsong === true) {
+                autoNext();
+            }
+        };
+    };
 
     function playToPause() {
         button = document.getElementById('playButton');
-        if(button.textContent === 'Play') {
-            button.textContent = 'Pause';
-        }else if (button.textContent === 'Pause') {
-            button.textContent = 'Play';
+        if(button.innerHTML === '<i class="fa fa-play" aria-hidden="true"></i>') {
+            button.innerHTML = '<i class="fa fa-pause" aria-hidden="true"></i>';
+        }else if (button.innerHTML === '<i class="fa fa-pause" aria-hidden="true"></i>') {
+            button.innerHTML = '<i class="fa fa-play" aria-hidden="true"></i>';
         }
     }
 
     function stop() {
         if (XMPlayer.playing === true) {
             XMPlayer.stop();
-            if (button.textContent === 'Pause') {
-                button.textContent = 'Play';
+            if (button.innerHTML === '<i class="fa fa-pause" aria-hidden="true"></i>') {
+            button.innerHTML = '<i class="fa fa-play" aria-hidden="true"></i>';
             }
         }
     }

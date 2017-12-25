@@ -26,6 +26,7 @@
     "busboy": "^0.2.14",
     "express": "^4.16.2",
     "express-fileupload": "^0.3.0",
+    "font-awesome": "^4.7.0",
     "mustache-express": "^1.2.5"
   }
 }
